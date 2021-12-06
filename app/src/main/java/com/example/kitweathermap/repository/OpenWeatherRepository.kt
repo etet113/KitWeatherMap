@@ -7,14 +7,14 @@ import kotlinx.coroutines.flow.*
 
 import kotlinx.coroutines.flow.map
 
-class OpenWeatherRepository(private val defaultDispatcher: CoroutineDispatcher) {
-
-    private val dataSource = OpenWeatherDataSource()
-
-    suspend fun getCityState(name:String): Flow<City> {
-        return flow{
+class OpenWeatherRepository(
+    private val defaultDispatcher: CoroutineDispatcher,
+    private val dataSource: OpenWeatherDataSource = OpenWeatherDataSource()
+) {
+    suspend fun getCityState(name: String): Flow<City> {
+        return flow {
             dataSource.getCityState(name).map { response ->
-                if(response.isSuccessful) response.body() else null
+                if (response.isSuccessful) response.body() else null
             }.collect {
                 it?.apply {
                     emit(this)
@@ -22,5 +22,4 @@ class OpenWeatherRepository(private val defaultDispatcher: CoroutineDispatcher) 
             }
         }.flowOn(defaultDispatcher)
     }
-
 }

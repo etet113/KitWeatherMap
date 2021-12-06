@@ -6,12 +6,15 @@ import androidx.fragment.app.viewModels
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.lifecycle.lifecycleScope
 import com.example.kitweathermap.adapter.WeatherResultAdapter
 import com.example.kitweathermap.base.BaseFragment
 import com.example.kitweathermap.databinding.MainFragmentBinding
 import com.example.kitweathermap.viewmodel.MainViewModel
 import com.example.kitweathermap.extension.isClickRightIcon
 import com.example.kitweathermap.extension.isKeyEnter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainFragment : BaseFragment<MainFragmentBinding, MainViewModel>() {
 
@@ -26,13 +29,20 @@ class MainFragment : BaseFragment<MainFragmentBinding, MainViewModel>() {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(binding: MainFragmentBinding) {
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            readPreferencesDataStore("last")?.apply {
+                viewModel.getCityState(this)
+            }
+        }
+
         binding.rvWeatherResult.adapter = resultAdapter
         binding.etSearch.apply {
             setOnKeyListener { view, keyCode, event ->
                 when (view) {
                     is EditText -> {
                         isKeyEnter(keyCode, event) {
-                            viewModel.getCityState(it)
+                            gotoSearch(it)
                         }
                     }
                     else -> return@setOnKeyListener false
@@ -42,7 +52,7 @@ class MainFragment : BaseFragment<MainFragmentBinding, MainViewModel>() {
                 when (view) {
                     is EditText -> {
                         isClickRightIcon(event) {
-                            viewModel.getCityState(it)
+                            gotoSearch(it)
                         }
                     }
                     else -> return@setOnTouchListener false
@@ -53,7 +63,13 @@ class MainFragment : BaseFragment<MainFragmentBinding, MainViewModel>() {
         viewModel.cityState.observe(viewLifecycleOwner, { cityData ->
             resultAdapter.submitList(cityData)
         })
+    }
 
+    private fun gotoSearch(cityName:String){
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            writePreferencesDataStore("last",cityName)
+        }
+        viewModel.getCityState(cityName)
     }
 }
 
