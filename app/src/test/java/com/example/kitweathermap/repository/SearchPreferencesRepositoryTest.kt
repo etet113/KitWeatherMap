@@ -53,12 +53,12 @@ class SearchPreferencesRepositoryTest {
     fun getSearchResultListTest() = coroutineDispatcher.runBlockingTest {
         //Given
         val repository = SearchPreferencesRepository(searchResultLogic)
-        coEvery { searchResultLogic.getSearchResultList() } returns listOf("Hong Kong","London")
+        coEvery { searchResultLogic.getSearchResultList() } returns listOf("Hong Kong", "London")
 
         //When
         val resultList = repository.getSearchResultList()
 
         //Then
-        Assert.assertEquals(listOf("Hong Kong","London"), resultList)
+        Assert.assertEquals(listOf("Hong Kong", "London"), resultList)
     }
 }

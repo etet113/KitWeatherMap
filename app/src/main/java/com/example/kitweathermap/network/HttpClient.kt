@@ -11,6 +11,6 @@ interface HttpClient {
     suspend fun getWeatherByCity(
         @Query("q") cityName: String,
         @Query("appid") apiKey: String,
-        @Query("units") units:String = "metric"
+        @Query("units") units: String = "metric"
     ): Response<City>
 }

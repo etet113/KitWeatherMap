@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kitweathermap.databinding.LayoutTextBinding
 
 class WeatherResultAdapter : ListAdapter<Pair<String,String?>, RecyclerView.ViewHolder>(DiffCallback()) {
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = LayoutTextBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ItemViewHolder(binding)

@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kitweathermap.databinding.LayoutTextBinding
 
-class SearchResultAdapter: ListAdapter< String , RecyclerView.ViewHolder>(SearchResultDiffCallback()) {
-
+class SearchResultAdapter :
+    ListAdapter<String, RecyclerView.ViewHolder>(SearchResultDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = LayoutTextBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ItemViewHolder(binding)
@@ -23,20 +23,21 @@ class SearchResultAdapter: ListAdapter< String , RecyclerView.ViewHolder>(Search
         }
     }
 
-    class ItemViewHolder(private val binding: LayoutTextBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item:String) {
+    class ItemViewHolder(private val binding: LayoutTextBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: String) {
             binding.tvKey.visibility = View.GONE
             binding.tvValue.text = item
         }
     }
 }
 
-class SearchResultDiffCallback: DiffUtil.ItemCallback<String>() {
+class SearchResultDiffCallback : DiffUtil.ItemCallback<String>() {
     override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
-        return oldItem.equals(newItem,true)
+        return oldItem.equals(newItem, true)
     }
 
     override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
-        return oldItem.equals(newItem,true)
+        return oldItem.equals(newItem, true)
     }
 }

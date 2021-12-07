@@ -8,13 +8,12 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.Response
 
 class OpenWeatherDataSource {
-
     private val apiClient = APIClient.getAPIClient()
     private val apiKey = BuildConfig.API_KEY
 
-    suspend fun getCityState(name:String): Flow<Response<City>> {
+    suspend fun getCityState(name: String): Flow<Response<City>> {
         return flow {
-            emit(apiClient.getWeatherByCity(name,apiKey))
+            emit(apiClient.getWeatherByCity(name, apiKey))
         }
     }
 }

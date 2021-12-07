@@ -21,7 +21,6 @@ import com.example.kitweathermap.repository.SearchPreferencesRepository
 import kotlinx.coroutines.Dispatchers
 
 class MainFragment : BaseFragment<MainFragmentBinding, MainViewModel>() {
-
     lateinit var viewModel: MainViewModel
     private val resultAdapter = WeatherResultAdapter()
     private val searchHintsAdapter = SearchResultAdapter()

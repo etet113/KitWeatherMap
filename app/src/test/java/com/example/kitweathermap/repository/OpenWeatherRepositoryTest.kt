@@ -17,7 +17,6 @@ import retrofit2.Response.success
 
 @ExperimentalCoroutinesApi
 class OpenWeatherRepositoryTest {
-
     private val coroutineDispatcher = TestCoroutineDispatcher()
 
     private val sampleJson = City(
@@ -70,9 +69,9 @@ class OpenWeatherRepositoryTest {
         val repository = OpenWeatherRepository(coroutineDispatcher, dataSource)
         coEvery { dataSource.getCityState("Hong Kong") } returns flow { success(sampleJson) }
         //When
-        repository.getCityState("Hong Kong").collect{
+        repository.getCityState("Hong Kong").collect {
             //Then
-            assertEquals(sampleJson,it)
+            assertEquals(sampleJson, it)
         }
     }
 }

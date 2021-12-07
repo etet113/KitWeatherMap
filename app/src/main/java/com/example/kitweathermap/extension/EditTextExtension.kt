@@ -16,7 +16,7 @@ fun EditText.isClickRightIcon(event: MotionEvent, action: (String) -> Unit): Boo
     return false
 }
 
-fun EditText.isKeyEnter(keyCode: Int,event: KeyEvent,action: (String) -> Unit): Boolean {
+fun EditText.isKeyEnter(keyCode: Int, event: KeyEvent, action: (String) -> Unit): Boolean {
     val textString = text.toString()
     if ((keyCode == KeyEvent.KEYCODE_ENTER) && (event.action == KeyEvent.ACTION_DOWN)) {
         action(textString)
