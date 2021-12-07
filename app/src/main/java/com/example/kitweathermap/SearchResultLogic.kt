@@ -5,12 +5,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.kitweathermap.extension.toTrimList
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 
-class SearchResultLogic(private val dataStore: DataStore<Preferences>?) {
-
-    private val RESULT_MAX_SIZE = 5
+class SearchResultLogic(
+    private val dataStore: DataStore<Preferences>?
+) {
+    private val resultMaxSize = 5
     private val resultListKey = stringPreferencesKey("ResultList")
 
     suspend fun writeToResultList(cityName: String) {
@@ -20,7 +20,7 @@ class SearchResultLogic(private val dataStore: DataStore<Preferences>?) {
             }
         } else {
             readToResultList()?.toTrimList()?.apply {
-                if (size >= RESULT_MAX_SIZE) {
+                if (size >= resultMaxSize) {
                     removeFirst()
                 }
                 // TODO // Remove Same Item

@@ -2,15 +2,13 @@ package com.example.kitweathermap.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.viewModels
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import com.example.kitweathermap.SearchResultLogic
 import com.example.kitweathermap.adapter.SearchResultAdapter
 import com.example.kitweathermap.adapter.WeatherResultAdapter
 import com.example.kitweathermap.base.BaseFragment
@@ -21,7 +19,6 @@ import com.example.kitweathermap.extension.isKeyEnter
 import com.example.kitweathermap.repository.OpenWeatherRepository
 import com.example.kitweathermap.repository.SearchPreferencesRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MainFragment : BaseFragment<MainFragmentBinding, MainViewModel>() {
 
@@ -41,7 +38,9 @@ class MainFragment : BaseFragment<MainFragmentBinding, MainViewModel>() {
             this,
             MainViewModel.MainViewModelFactory(
                 OpenWeatherRepository(Dispatchers.IO),
-                SearchPreferencesRepository(requireContext())
+                SearchPreferencesRepository(
+                    SearchResultLogic(requireContext().searchResultDataStore)
+                )
             )
         ).get(MainViewModel::class.java)
 
@@ -74,23 +73,22 @@ class MainFragment : BaseFragment<MainFragmentBinding, MainViewModel>() {
             }
         }
 
-        viewModel.cityState.observe(viewLifecycleOwner){ cityData ->
+        viewModel.cityState.observe(viewLifecycleOwner) { cityData ->
             resultAdapter.submitList(cityData)
         }
-        viewModel.searchResultList.observe(viewLifecycleOwner){
+        viewModel.searchResultList.observe(viewLifecycleOwner) {
             searchHintsAdapter.submitList(it)
         }
 
-        viewModel.isShowSearchHint.observe(viewLifecycleOwner){
-           if(it){
-               binding.rvWeatherResult.visibility = View.GONE
-               binding.rvSearchResult.visibility = View.VISIBLE
-           }else{
-               binding.rvWeatherResult.visibility = View.VISIBLE
-               binding.rvSearchResult.visibility = View.GONE
-           }
+        viewModel.isShowSearchHint.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.rvWeatherResult.visibility = View.GONE
+                binding.rvSearchResult.visibility = View.VISIBLE
+            } else {
+                binding.rvWeatherResult.visibility = View.VISIBLE
+                binding.rvSearchResult.visibility = View.GONE
+            }
         }
-
 
         //Auto Loading
         viewModel.detectSearchResult()
