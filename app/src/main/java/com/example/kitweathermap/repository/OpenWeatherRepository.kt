@@ -11,14 +11,12 @@ class OpenWeatherRepository(
     private val defaultDispatcher: CoroutineDispatcher,
     private val dataSource: OpenWeatherDataSource = OpenWeatherDataSource()
 ) {
-    suspend fun getCityState(name: String): Flow<City> {
+    suspend fun getCityState(name: String): Flow<City?> {
         return flow {
             dataSource.getCityState(name).map { response ->
                 if (response.isSuccessful) response.body() else null
             }.collect {
-                it?.apply {
-                    emit(this)
-                }
+                emit(it)
             }
         }.flowOn(defaultDispatcher)
     }

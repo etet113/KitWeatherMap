@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.map
 abstract class BaseFragment<B : ViewDataBinding, VM : ViewModel> : Fragment()  {
 
     lateinit var binding:B
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "SearchResult")
+    //private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "SearchResult")
 
     abstract fun getBindingView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,19 +42,6 @@ abstract class BaseFragment<B : ViewDataBinding, VM : ViewModel> : Fragment()  {
         }
     }
 
-    protected suspend fun writePreferencesDataStore(keyName: String,value:String) {
-        val key = stringPreferencesKey(keyName)
-        requireContext().dataStore.edit { settings ->
-            settings[key] = value
-        }
-    }
 
-    protected suspend fun readPreferencesDataStore(keyName: String): String? {
-        val key = stringPreferencesKey(keyName)
-        return requireContext().dataStore.data
-            .map { preferences ->
-                preferences[key]
-            }.first()
-    }
 
 }

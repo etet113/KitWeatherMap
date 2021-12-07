@@ -2,24 +2,32 @@ package com.example.kitweathermap.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.viewModels
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.example.kitweathermap.adapter.SearchResultAdapter
 import com.example.kitweathermap.adapter.WeatherResultAdapter
 import com.example.kitweathermap.base.BaseFragment
 import com.example.kitweathermap.databinding.MainFragmentBinding
 import com.example.kitweathermap.viewmodel.MainViewModel
 import com.example.kitweathermap.extension.isClickRightIcon
 import com.example.kitweathermap.extension.isKeyEnter
+import com.example.kitweathermap.repository.OpenWeatherRepository
+import com.example.kitweathermap.repository.SearchPreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainFragment : BaseFragment<MainFragmentBinding, MainViewModel>() {
 
-    private val viewModel: MainViewModel by viewModels()
+    lateinit var viewModel: MainViewModel
     private val resultAdapter = WeatherResultAdapter()
+    private val searchHintsAdapter = SearchResultAdapter()
 
     override fun getBindingView(
         inflater: LayoutInflater,
@@ -29,20 +37,23 @@ class MainFragment : BaseFragment<MainFragmentBinding, MainViewModel>() {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(binding: MainFragmentBinding) {
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            readPreferencesDataStore("last")?.apply {
-                viewModel.getCityState(this)
-            }
-        }
+        viewModel = ViewModelProvider(
+            this,
+            MainViewModel.MainViewModelFactory(
+                OpenWeatherRepository(Dispatchers.IO),
+                SearchPreferencesRepository(requireContext())
+            )
+        ).get(MainViewModel::class.java)
 
         binding.rvWeatherResult.adapter = resultAdapter
+        binding.rvSearchResult.adapter = searchHintsAdapter
+
         binding.etSearch.apply {
             setOnKeyListener { view, keyCode, event ->
                 when (view) {
                     is EditText -> {
                         isKeyEnter(keyCode, event) {
-                            gotoSearch(it)
+                            viewModel.getCityState(it)
                         }
                     }
                     else -> return@setOnKeyListener false
@@ -52,24 +63,37 @@ class MainFragment : BaseFragment<MainFragmentBinding, MainViewModel>() {
                 when (view) {
                     is EditText -> {
                         isClickRightIcon(event) {
-                            gotoSearch(it)
+                            viewModel.getCityState(it)
                         }
                     }
                     else -> return@setOnTouchListener false
                 }
             }
+            doAfterTextChanged {
+                viewModel.getSearchResultList()
+            }
         }
 
-        viewModel.cityState.observe(viewLifecycleOwner, { cityData ->
+        viewModel.cityState.observe(viewLifecycleOwner){ cityData ->
             resultAdapter.submitList(cityData)
-        })
-    }
-
-    private fun gotoSearch(cityName:String){
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            writePreferencesDataStore("last",cityName)
         }
-        viewModel.getCityState(cityName)
+        viewModel.searchResultList.observe(viewLifecycleOwner){
+            searchHintsAdapter.submitList(it)
+        }
+
+        viewModel.isShowSearchHint.observe(viewLifecycleOwner){
+           if(it){
+               binding.rvWeatherResult.visibility = View.GONE
+               binding.rvSearchResult.visibility = View.VISIBLE
+           }else{
+               binding.rvWeatherResult.visibility = View.VISIBLE
+               binding.rvSearchResult.visibility = View.GONE
+           }
+        }
+
+
+        //Auto Loading
+        viewModel.detectSearchResult()
     }
 }
 

@@ -7,6 +7,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.RelaxedMockK
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.kitweathermap.repository.SearchPreferencesRepository
 import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +29,9 @@ class MainViewModelTest {
 
     @RelaxedMockK
     lateinit var repository: OpenWeatherRepository
+
+    @RelaxedMockK
+    lateinit var searchResultRepository: SearchPreferencesRepository
 
     lateinit var viewModel: MainViewModel
 
@@ -85,7 +89,7 @@ class MainViewModelTest {
     fun getCityStateTest() = coroutineDispatcher.runBlockingTest {
         //Given
         val slot = slot<List<Pair<String,String>>>()
-        viewModel = MainViewModel(repository)
+        viewModel = MainViewModel(repository,searchResultRepository)
         coEvery { repository.getCityState("Hong Kong") } returns flow { emit(sampleJson) }
         viewModel.cityState.observeForever(cityStateObserver)
         //When
