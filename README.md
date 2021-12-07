@@ -1,6 +1,7 @@
 # KitWeatherMap
-Android coding challenge \n
--Used MVVM & Jetpack & Kotlin Flow & Mockk(Unit Test)
+Android coding challenge
+
+*Used MVVM & Jetpack & Kotlin Flow & Mockk(Unit Test)
 
 * Done
   * -Search by city name
