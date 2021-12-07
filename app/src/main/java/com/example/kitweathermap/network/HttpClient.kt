@@ -13,5 +13,4 @@ interface HttpClient {
         @Query("appid") apiKey: String,
         @Query("units") units:String = "metric"
     ): Response<City>
-
 }

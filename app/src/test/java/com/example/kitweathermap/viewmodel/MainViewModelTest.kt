@@ -74,10 +74,17 @@ class MainViewModelTest {
     @RelaxedMockK
     lateinit var cityStateObserver: Observer<List<Pair<String,String?>>>
 
+    @RelaxedMockK
+    lateinit var searchResultListObserver: Observer<List<String>>
+
+    @RelaxedMockK
+    lateinit var isShowSearchHintObserver: Observer<Boolean>
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(coroutineDispatcher)
+        viewModel = MainViewModel(repository,searchResultRepository)
     }
 
     @After
@@ -89,7 +96,6 @@ class MainViewModelTest {
     fun getCityStateTest() = coroutineDispatcher.runBlockingTest {
         //Given
         val slot = slot<List<Pair<String,String>>>()
-        viewModel = MainViewModel(repository,searchResultRepository)
         coEvery { repository.getCityState("Hong Kong") } returns flow { emit(sampleJson) }
         viewModel.cityState.observeForever(cityStateObserver)
         //When
@@ -107,7 +113,51 @@ class MainViewModelTest {
             "Maximum temperature" to "23.47 \u2103",
             "Wind speed" to "0.45 m/s",
         ), slot.captured)
+    }
 
+    @Test
+    fun detectSearchResult(){
+        //Given
+        val slot = slot<List<Pair<String,String>>>()
+        coEvery { searchResultRepository.getLastSearchResult() } returns "Hong Kong"
+        coEvery { repository.getCityState("Hong Kong") } returns flow { emit(sampleJson) }
+        viewModel.cityState.observeForever(cityStateObserver)
+
+        //When
+        viewModel.detectSearchResult()
+
+        //Then
+        verify {
+            cityStateObserver.onChanged(capture(slot))
+        }
+        Assert.assertEquals(listOf(
+            "City Name:" to "Hong Kong",
+            "Temperature:" to "21.89 \u2103",
+            "Humidity:" to "49%",
+            "Minimum temperature:" to "18.99 \u2103",
+            "Maximum temperature" to "23.47 \u2103",
+            "Wind speed" to "0.45 m/s",
+        ), slot.captured)
+    }
+
+    @Test
+    fun getSearchResultList(){
+        val slot = slot<List<String>>()
+        val slotHints =slot<Boolean>()
+        coEvery { searchResultRepository.getSearchResultList() } returns listOf("Hong Kong","Tokyo","London")
+        viewModel.searchResultList.observeForever(searchResultListObserver)
+        viewModel.isShowSearchHint.observeForever(isShowSearchHintObserver)
+        //when
+        viewModel.getSearchResultList()
+
+        //Then
+        verify {
+            searchResultListObserver.onChanged(capture(slot))
+            isShowSearchHintObserver.onChanged(capture(slotHints))
+        }
+
+        Assert.assertEquals(listOf("Hong Kong","Tokyo","London"), slot.captured)
+        Assert.assertEquals(true, slotHints.captured)
     }
 
 }

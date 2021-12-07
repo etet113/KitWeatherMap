@@ -17,5 +17,4 @@ class OpenWeatherDataSource {
             emit(apiClient.getWeatherByCity(name,apiKey))
         }
     }
-
 }

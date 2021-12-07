@@ -24,4 +24,3 @@ fun EditText.isKeyEnter(keyCode: Int,event: KeyEvent,action: (String) -> Unit): 
     }
     return false
 }
-

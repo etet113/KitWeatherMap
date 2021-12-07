@@ -3,7 +3,6 @@ package com.example.kitweathermap.viewmodel
 import androidx.lifecycle.*
 import com.example.kitweathermap.repository.OpenWeatherRepository
 import com.example.kitweathermap.repository.SearchPreferencesRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -11,7 +10,6 @@ class MainViewModel(private val repository:OpenWeatherRepository,private val sea
 
     private val _cityState = MutableLiveData<List<Pair<String,String?>>>()
     private val _searchResultList = MutableLiveData<List<String>>()
-
 
     val cityState: LiveData<List<Pair<String,String?>>> = _cityState
     val searchResultList:LiveData<List<String>> = _searchResultList
@@ -73,5 +71,4 @@ class MainViewModel(private val repository:OpenWeatherRepository,private val sea
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
-
 }
